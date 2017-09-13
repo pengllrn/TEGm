@@ -48,9 +48,9 @@ class DeviceGis(models.Model):
     schoolid = models.IntegerField(db_column='SchoolId', blank=True, null=True)  # 学校id
 
     class Meta:
-        db_table = 'GisDevice'
+        db_table = 'DeviceGis'
 
-class DeviceAlarm:
+class DeviceAlarm(models.Model):
     deviceid = models.IntegerField(db_column="DeviceId", blank=True, null=True)  # 设备ID
     deviceno = models.CharField(db_column='DeviceNo', max_length=20, blank=True, null=True)  # 设备唯一的编号
     schoolid = models.IntegerField(db_column='SchoolId',blank=True, null=True)  # 学校id
@@ -61,7 +61,7 @@ class DeviceAlarm:
     class Meta:
         db_table = 'DeviceAlarm'
 
-class DeviceUseRecord:
+class DeviceUseRecord(models.Model):
     deviceid = models.IntegerField(db_column="DeviceId", blank=True, null=True)  # 设备ID
     schoolid = models.IntegerField(db_column='SchoolId',blank=True, null=True)  # 学校id
     existimage = models.BooleanField(db_column='ExistImage',blank=True, null=True)  #是否有图像
@@ -72,21 +72,21 @@ class DeviceUseRecord:
     class Meta:
         db_table = 'DeviceUseRecord'
 
-class DeviceToSensor:
+class DeviceToSensor(models.Model):
     indentifier = models.CharField(db_column='Identifier', max_length=50, blank=True, null=True)  # 传感器的编号
     sensorid = models.IntegerField(db_column='SensorId',blank=True, null=True) #传感的硬件编号
 
     class Meta:
         db_table = 'DeviceToSensor'
 
-class DeviceType:
+class DeviceType(models.Model):
     typeid = models.IntegerField(db_column="TypeId", blank=True, null=True)  # 设备类型id
     typename = models.CharField(db_column="TypeName",blank=True,null=True)  #设备名称
 
     class Meta:
         db_table = "DeviceType"
 
-class SchoolInfo:
+class SchoolInfo(models.Model):
     schoolid = models.IntegerField(db_column='SchoolId', blank=True, null=True)  # 学校id
     schoolname = models.CharField(db_column='SchoolName',max_length=40,blank=True,null=True)  #学校名字
     schoolregister = models.CharField(db_column="SchoolRegister",max_length=50,blank=True,null=True)  #学校的注册号
@@ -97,6 +97,60 @@ class SchoolInfo:
     class Meta:
         db_table = "SchoolInfo"
 
+class UserModel(models.Model):
+    userid = models.CharField(db_column='UserId',max_length=40,blank=True,null=True)  #用户账号
+    userpassword = models.CharField(db_column='UserPassword',max_length=40,blank=True,null=True)  #用户密码
+    name = models.CharField(db_column='Name', max_length=20, blank=True, null=True)  #用户姓名
+    authority = models.BooleanField(db_column='Authority',blank=True,null=True)  #操作权限:查看，维护
+    systemcontrol = models.BooleanField(db_column='SystemControl',blank=True,null=True)  #系统权限：审核
+    level = models.IntegerField(db_column='Level',blank=True,null=True)  #用户等级
+    email = models.EmailField(db_column='Email', blank=True, null=True)  #Email
+    telephonenum = models.TextField(db_column='TelephoneNum', blank=True, null=True) #Tel
+    weixin = models.TextField(db_column='TelephoneNum', blank=True, null=True) #微信
+
+    class Meta:
+        db_table = 'UserModel'
+
+class UserAuthority(models.Model):
+    userid = models.CharField(db_column='UserId', max_length=40, blank=True, null=True)  # 用户账号
+    schoolid = models.IntegerField(db_column='SchoolId', blank=True, null=True)  # 学校id
+
+    class Meta:
+        db_table = 'UserAuthority'
+
+class PropertyDamage(models.Model):
+    deviceid = models.IntegerField(db_column="DeviceId", blank=True, null=True)  # 设备ID
+    applier = models.CharField(db_column='Applier',max_length=40,blank=True,null=True)  #申请人姓名
+    applierid = models.IntegerField(db_column='ApplierId',blank=True,null=True) #申请人ID
+    appliertel = models.TextField(db_column="ApplierTel",blank=True,null=True)  #申请人电话
+    datetime = models.DateField(db_column='DateTime',blank=True,null=True)  #申述时间
+
+    class Meta:
+        db_table = "PropertyDamage"
+
+class PropertyCheck(models.Model):
+    deviceid = models.IntegerField(db_column="DeviceId", blank=True, null=True)  # 设备ID
+    checkerid = models.CharField(db_column='CheckerId',max_length=40,blank=True,null=True)  #审核人ID
+    checkername = models.CharField(db_column='CheckerName',max_length=40,blank=True,null=True) #审核人姓名
+    checketime = models.DateField(db_column='CheckeTime',blank=True,null=True)  #审核时间
+    checkerflag = models.BooleanField(db_column='CheckFlag',blank=True,null=True)  #审核结果
+
+    class Meta:
+        db_table = 'PropertyCheck'
+
+class DeviceInfo(models.Model):
+    deviceid = models.IntegerField(db_column="DeviceId", blank=True, null=True)  # 设备ID
+    deviceno = models.CharField(db_column='DeviceNo', max_length=20, blank=True, null=True)  # 设备唯一的编号
+    schoolid = models.IntegerField(db_column='SchoolId', blank=True, null=True)  # 学校id
+    roomid = models.CharField(db_column='RoomId', max_length=20, blank=True, null=True)  #房间ID
+    orderno = models.IntegerField(db_column='OrderNo', blank=True, null=True)  # 设备在房间里的序号
+    devicekind = models.CharField(db_column='DeviceKind',max_length=50,blank=True,null=True)  #设备型号
+    description = models.TextField(db_column='Description',blank=True,null=True)  #设备描述
+    configureinfo = models.CharField(db_column='ConfigureInfo',blank=True,null=True)  #配置信息
+    useflag = models.BooleanField(db_column="UseFlag",blank=True,null=True)  #使用状态
+
+    class Meta:
+        db_table = 'DeviceInfo'
 
 
 
