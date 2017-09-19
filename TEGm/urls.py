@@ -20,4 +20,6 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^Login/(?P<user_id>[A-Za-z0-9]+)/(?P<user_pwd>[A-Za-z0-9]+)/$',tv.ard_login),
     url(r'^TEGApp/', include('TEGApp.urls')),
+    url(r'^server_login/fruit/$',tv.getFruits),
+    url(r'^getdeviceinfo/$',tv.getDeviceInfo),
 ]

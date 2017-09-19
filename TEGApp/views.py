@@ -23,10 +23,10 @@ def ard_login(request,user_id,user_pwd):
 
 @csrf_exempt
 def getFruits(request):
-    fruits = models.Fruits.objects.all().order_by("-id")
+    fruits = models.Fruits.objects.all().order_by("id")
     fruit = fruits[0:99]
     print request.POST.get("username")
-    # for fruit in fruits:
+
     #     d[fruit.id] = fruit.fruitname
     c = {"fruits":formatDicts(fruit),}
     return HttpResponse(json.dumps(c["fruits"]))
@@ -37,5 +37,28 @@ def formatDicts(objs):
         obj_arr.append(o.format())
     return obj_arr
 
-def sqlExcute(request):
-    pass
+@csrf_exempt
+def getDeviceInfo(request):
+    devices = models.DeviceInfo.objects.all().order_by("id")
+    device = devices[0:99]
+    obj_arr=[]
+    for dv in device:
+        d = dv.format()
+        # School=models.SchoolInfo.objects.get(pk =dv.schoolid)
+        # name =School.schoolname
+        # d["SchoolName"] = name
+        Type = models.DeviceType.objects.get(pk = dv.typeid)
+        typename = Type.typename
+        d["TypeId"] = typename
+
+        Room = models.RoomInfo.objects.get(pk = dv.roomid)
+        roomname = Room.building+" "+Room.roomname
+        d["RoomId"] = roomname
+
+        if d["UseFlag"]== 1:
+            d["UseFlag"]="（正在使用）"
+        else:
+            d["UseFlag"] = "（未使用）"
+        obj_arr.append(d)
+    return HttpResponse(json.dumps(obj_arr))
+
