@@ -13,6 +13,7 @@ def ard_login(request,user_id,user_pwd):
     user = models.Login.objects.filter(pk=user_id)
     if user[0] != None:
         if user[0].user_id == user_id and user[0].user_pwd == user_pwd:
+            request.session['IS_LOGIN'] = True
             return HttpResponse("true")
     return HttpResponse("false")
 
@@ -21,8 +22,8 @@ def getFruits(request):
     fruits = models.Fruits.objects.all().order_by("id")
     fruit = fruits[0:99]
     print request.POST.get("username")
-    c = {"fruits":formatDicts(fruit),}
-    return HttpResponse(json.dumps(c["fruits"]))
+    c = {"fruits":formatDicts(fruit),"apple":formatDicts(fruit)}
+    return HttpResponse(json.dumps(c["apple"]))
 
 def formatDicts(objs):
     obj_arr=[]
@@ -32,26 +33,50 @@ def formatDicts(objs):
 
 @csrf_exempt
 def getDeviceInfo(request):
-    devices = models.DeviceInfo.objects.all().order_by("devicenum")
-    device = devices[0:99]
-    obj_arr=[]
-    for dv in device:
-        d = dv.format()
-        #获取设备类型名
-        Type = models.DeviceType.objects.get(pk = dv.typeid)
-        typename = Type.typename
-        d["TypeId"] = typename
-        #获取房间名
-        Room = models.RoomInfo.objects.get(pk = dv.roomid)
-        roomname = Room.building+" "+Room.roomname
-        d["RoomId"] = roomname
-        #获取使用状态
-        if d["UseFlag"]== 1:
-            d["UseFlag"]="（正在使用）"
-        else:
-            d["UseFlag"] = "（未使用）"
-        #添加设备类型图片的静态地址
-        d["imgUrl"] = "http://192.168.1.20:9999/static/img/"+str(dv.typeid)+".png"
+    is_login = request.session.get("IS_LOGIN",True)
+    print
+    if is_login:
+        devices = models.DeviceInfo.objects.all().order_by("id")
+        device = devices[0:99]
+        obj_arr = []
+        for dv in device:
+            d = dv.format()
+            # 获取设备类型名
+            Type = models.DeviceType.objects.get(pk=dv.typeid)
+            typename = Type.typename
+            d["TypeId"] = typename
+            # 获取房间名
+            Room = models.RoomInfo.objects.get(pk=dv.roomid)
+            roomname = Room.building + " " + Room.roomname
+            d["RoomId"] = roomname
+            # 获取使用状态
+            if d["UseFlag"] == 1:
+                d["UseFlag"] = "（正在使用）"
+            else:
+                d["UseFlag"] = "（未使用）"
+            # 添加设备类型图片的静态地址
+            d["imgUrl"] = "http://192.168.1.20:9999/static/img/" + str(dv.typeid) + ".jpg"
+            obj_arr.append(d)
+        return HttpResponse(json.dumps(obj_arr))
+
+@csrf_exempt
+def get_school_building_room(request):
+    roominfo = models.RoomInfo.objects.all()
+    obj_arr = []
+    building = []
+    for rm in roominfo:
+        if not rm.building in building:
+            building.append(rm.building)
+    for bd in building:
+        d = {}
+        d["building"] = bd
+        room=models.RoomInfo.objects.filter(building=bd)
+        f = []
+        for rm in room:
+            e = {}
+            e["roomname"]=rm.roomname
+            f.append(e)
+        d["room"]=f
         obj_arr.append(d)
     return HttpResponse(json.dumps(obj_arr))
 

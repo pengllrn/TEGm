@@ -22,4 +22,5 @@ urlpatterns = [
     url(r'^TEGApp/', include('TEGApp.urls')),
     url(r'^server_login/fruit/$',tv.getFruits),
     url(r'^getdeviceinfo/$',tv.getDeviceInfo),
+    url(r'^getdevice/$',tv.get_school_building_room),
 ]
