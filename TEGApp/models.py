@@ -31,15 +31,40 @@ class Device(models.Model):
     number = models.CharField(db_column='Number',max_length=20,blank=True,null=True) #设备编号(可能不唯一)
     typeid = models.IntegerField(db_column="TypeId",blank=True,null=True)  #设备类型id
     univalence = models.FloatField(db_column='Univalence',blank=True,null=True)  #设备单价
-    #indentifier = models.CharField(db_column='Identifier',max_length=50,blank=True,null=True)  #传感器的编号
     sensorid = models.IntegerField(db_column='SensorId',blank=True, null=True)  # 传感器的编号
     schoolid = models.IntegerField(db_column='SchoolId',blank=True,null=True)  #学校id
     checkerid = models.IntegerField(db_column="CheckerId",blank=True,null=True) #检查人，负责人编号
     checkername = models.CharField(db_column='CheckerName',max_length=20,blank=True,null=True) #负责人的名字
-    status = models.IntegerField(db_column="Status",blank=True,null=True) #设备的状态
+    status = models.IntegerField(db_column="Status",blank=True,null=True) #
+
+    regist_first=models.DateField(db_column="regist_first",blank=True,null=True)#第一次登记的时间
+    use_depart=models.CharField(db_column="use_depart",max_length=20,blank=True,null=True)#使用部门
+
 
     class Meta:
         db_table = 'Device'
+
+class DeviceInfo(models.Model):
+    deviceid = models.IntegerField(db_column="DeviceId", blank=True, null=True)  # 设备ID
+    devicenum = models.CharField(db_column='DeviceNum', max_length=20, blank=True, null=True)  # 设备唯一的编号
+    schoolid = models.IntegerField(db_column='SchoolId', blank=True, null=True)  # 学校id
+    typeid = models.IntegerField(db_column="TypeId", blank=True, null=True)  # 设备类型id
+    roomid = models.CharField(db_column='RoomId', max_length=20, blank=True, null=True)  #房间ID
+    ordernum = models.IntegerField(db_column='OrderNum', blank=True, null=True)  # 设备在房间里的序号
+    devicekind = models.CharField(db_column='DeviceKind',max_length=50,blank=True,null=True)  #设备型号
+    description = models.TextField(db_column='Description',blank=True,null=True)  #设备描述
+    configureinfo = models.CharField(db_column='ConfigureInfo',max_length=30,blank=True,null=True)  #配置信息
+    useflag = models.BooleanField(db_column="UseFlag",blank=True)  #使用状态
+    max_use_time=models.IntegerField(db_column="max_use_time",blank=True,null=True)#日最长使用时间
+
+    def __str__(self):
+        return self.id
+    def format(self):
+        return {u'DeviceId':self.deviceid,u'TypeId':self.typeid,u'DeviceNum':self.devicenum,u'RoomId':self.roomid,
+                u'OrderNum':self.ordernum,u'UseFlag':self.useflag}
+
+    class Meta:
+        db_table = 'DeviceInfo'
 
 class DeviceGis(models.Model):
     longitude = models.FloatField(db_column='Longitude',blank=True,null=True)  #经度
@@ -67,11 +92,18 @@ class DeviceUseRecord(models.Model):
     schoolid = models.IntegerField(db_column='SchoolId',blank=True, null=True)  # 学校id
     existimage = models.BooleanField(db_column='ExistImage',blank=True)  #是否有图像
     imageaddress = models.CharField(db_column='ImageAddress', max_length=40,blank=True, null=True)  # 图片地址
+    date = models.DateField(db_column="date", blank=True, null=True)  # 使用的时间
     begintime = models.DateField(db_column='BeginTime',blank=True, null=True)  #设备开始使用的时间
     endtime = models.DateField(db_column='EndTime',blank=True, null=True)  #设备结束使用的时间
 
     class Meta:
         db_table = 'DeviceUseRecord'
+
+#设备使用频率表
+class DeviceUseRate(models.Model):
+    deviceid = models.IntegerField(db_column="DeviceId", blank=True, null=True)  # 设备ID
+    date = models.DateField(db_column="date",blank=True,null=True) #使用的时间
+    rate = models.FloatField(db_column="rate",blank=True,null=True) #使用率
 
 class DeviceToSensor(models.Model):
     sensornum = models.CharField(db_column='SensorNum', max_length=50, blank=True, null=True)  # 传感器的编号
@@ -139,26 +171,7 @@ class PropertyCheck(models.Model):
     class Meta:
         db_table = 'PropertyCheck'
 
-class DeviceInfo(models.Model):
-    deviceid = models.IntegerField(db_column="DeviceId", blank=True, null=True)  # 设备ID
-    devicenum = models.CharField(db_column='DeviceNum', max_length=20, blank=True, null=True)  # 设备唯一的编号
-    schoolid = models.IntegerField(db_column='SchoolId', blank=True, null=True)  # 学校id
-    typeid = models.IntegerField(db_column="TypeId", blank=True, null=True)  # 设备类型id
-    roomid = models.CharField(db_column='RoomId', max_length=20, blank=True, null=True)  #房间ID
-    ordernum = models.IntegerField(db_column='OrderNum', blank=True, null=True)  # 设备在房间里的序号
-    devicekind = models.CharField(db_column='DeviceKind',max_length=50,blank=True,null=True)  #设备型号
-    description = models.TextField(db_column='Description',blank=True,null=True)  #设备描述
-    configureinfo = models.CharField(db_column='ConfigureInfo',max_length=30,blank=True,null=True)  #配置信息
-    useflag = models.BooleanField(db_column="UseFlag",blank=True)  #使用状态
 
-    def __str__(self):
-        return self.id
-    def format(self):
-        return {u'DeviceId':self.deviceid,u'TypeId':self.typeid,u'DeviceNum':self.devicenum,u'RoomId':self.roomid,
-                u'OrderNum':self.ordernum,u'UseFlag':self.useflag}
-
-    class Meta:
-        db_table = 'DeviceInfo'
 
 class RoomInfo(models.Model):
     schoolid = models.IntegerField(db_column='SchoolId', blank=True, null=True)  # 学校id
@@ -167,14 +180,3 @@ class RoomInfo(models.Model):
 
     class Meta:
         db_table = 'RoomInfo'
-
-
-
-
-
-
-
-
-
-
-
