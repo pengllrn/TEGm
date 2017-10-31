@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from django.db import models
 
+import time
 # Create your models here.
 class Login(models.Model):
     user_id = models.CharField(max_length=40,primary_key=True)
@@ -40,6 +41,10 @@ class Device(models.Model):
     regist_first=models.DateField(db_column="regist_first",blank=True,null=True)#第一次登记的时间
     use_depart=models.CharField(db_column="use_depart",max_length=20,blank=True,null=True)#使用部门
 
+    def format2(self):
+        return {u'devicenum':self.number,u'type':self.typeid,u'sensorid':self.sensorid,u'status':self.status,
+                u"schoolname":self.schoolid,u'usedepart':self.use_depart,u'checkid':self.checkerid,
+                u'checkname':self.checkername,u'regist_first':self.regist_first.strftime("%Y-%m-%d")}
 
     class Meta:
         db_table = 'Device'
@@ -62,6 +67,9 @@ class DeviceInfo(models.Model):
     def format(self):
         return {u'DeviceId':self.deviceid,u'TypeId':self.typeid,u'DeviceNum':self.devicenum,u'RoomId':self.roomid,
                 u'OrderNum':self.ordernum,u'UseFlag':self.useflag}
+    def format2(self):
+        return {u'useflag':self.useflag,u'order':self.ordernum,u'devicekind':self.devicekind,u'description':self.description,
+                u'configureinfo':self.configureinfo}
 
     class Meta:
         db_table = 'DeviceInfo'
@@ -103,7 +111,14 @@ class DeviceUseRecord(models.Model):
 class DeviceUseRate(models.Model):
     deviceid = models.IntegerField(db_column="DeviceId", blank=True, null=True)  # 设备ID
     date = models.DateField(db_column="date",blank=True,null=True) #使用的时间
+    #date = models.CharField(db_column="date",max_length=20,blank=True,null=True)  #使用的时间
     rate = models.FloatField(db_column="rate",blank=True,null=True) #使用率
+
+    def format(self):
+        return {u'date':self.date.strftime("%m-%d"),u'rate':self.rate}
+
+    class Meta:
+        db_table = 'DeviceUseRate'
 
 class DeviceToSensor(models.Model):
     sensornum = models.CharField(db_column='SensorNum', max_length=50, blank=True, null=True)  # 传感器的编号
@@ -116,6 +131,10 @@ class DeviceToSensor(models.Model):
 class DeviceType(models.Model):
     #typeid = models.IntegerField(db_column="TypeId", blank=True, null=True)  # 设备类型id
     typename = models.CharField(db_column="TypeName",max_length=30,blank=True,null=True)  #设备名称
+
+    def format(self):
+        return {u'typename':self.typename}
+
     class Meta:
         db_table = "DeviceType"
 
@@ -156,7 +175,16 @@ class PropertyDamage(models.Model):
     applier = models.CharField(db_column='Applier',max_length=40,blank=True,null=True)  #申请人姓名
     applierid = models.IntegerField(db_column='ApplierId',blank=True,null=True) #申请人ID
     appliertel = models.TextField(db_column="ApplierTel",blank=True,null=True)  #申请人电话
-    datetime = models.DateField(db_column='DateTime',blank=True,null=True)  #申述时间
+    datetime = models.CharField(db_column='DateTime',max_length=40,blank=True,null=True)  #申述时间
+    #以下是补充
+    damagedepict=models.TextField(db_column='damage_depict',blank=True,null=True)   #设备损坏描述
+    photo1=models.TextField(db_column='photo_1',blank=True,null=True)  #图片1
+    photo2=models.TextField(db_column='photo_2',blank=True,null=True)  #图片2
+    photo3=models.TextField(db_column='photo_3',blank=True,null=True)  #图片3
+    photo4 = models.TextField(db_column='photo_4', blank=True, null=True)  # 图片4
+    photo5 = models.TextField(db_column='photo_5', blank=True, null=True)  # 图片5
+    photo6 = models.TextField(db_column='photo_6', blank=True, null=True)  # 图片6
+    voice = models.TextField(db_column='voice',blank=True,null=True)  #声音
 
     class Meta:
         db_table = "PropertyDamage"
@@ -172,11 +200,13 @@ class PropertyCheck(models.Model):
         db_table = 'PropertyCheck'
 
 
-
 class RoomInfo(models.Model):
     schoolid = models.IntegerField(db_column='SchoolId', blank=True, null=True)  # 学校id
     building = models.CharField(db_column='Building',max_length=50,blank=True,null=True)  #楼层名
     roomname = models.CharField(db_column='RoomName',max_length=50,blank=True,null=True)  #房间名
+
+    def format(self):
+        return {u'buildingname':self.building,u'roomname':self.roomname}
 
     class Meta:
         db_table = 'RoomInfo'
